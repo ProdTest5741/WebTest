@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout — The Desi Chapter</title>
+<link rel="icon" href="assets/logo.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="marquee-bar"><div class="marquee-track" id="marqueeTrack"></div></div>
+<div class="util-nav">
+  <button onclick="history.back()">&larr; Back</button>
+  <a href="index.html">&#8962; Home</a>
+</div>
+
+<header class="site-header">
+  <div class="header-row">
+    <div class="header-side left"><button class="hamburger" id="menuBtn" aria-label="Open menu"><span></span><span></span><span></span></button></div>
+    <a href="index.html" class="brand"><img data-brand-logo src="assets/logo.png" alt="The Desi Chapter" style="height:40px;"></a>
+    <div class="header-side right">
+      <a class="icon-link" href="login.html" title="Login"><svg viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 100-8 4 4 0 000 8zM4 20c0-4 4-6 8-6s8 2 8 6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <button class="icon-link" id="cartBtn" style="background:none;border:none;"><svg viewBox="0 0 24 24" fill="none"><path d="M6 6h15l-1.5 9h-12z" stroke="currentColor" stroke-linejoin="round"/><path d="M6 6L5 3H2" stroke="currentColor" stroke-linecap="round"/><circle cx="9" cy="20" r="1.4" fill="currentColor"/><circle cx="18" cy="20" r="1.4" fill="currentColor"/></svg><span class="cart-count">0</span></button>
+      <a class="icon-link" href="contact.html" title="Contact"><svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16v14H4z" stroke="currentColor"/><path d="M4 6l8 7 8-7" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    </div>
+  </div>
+</header>
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<aside class="drawer" id="navDrawer">
+  <button class="drawer-close" id="drawerCloseBtn" aria-label="Close menu">&times;</button>
+  <div class="brand" style="margin-bottom:30px;"><img data-brand-logo src="assets/logo.png" style="height:52px;" alt=""></div>
+  <nav><ul id="drawerMenu"></ul></nav>
+</aside>
+<div class="drawer-overlay" id="cartOverlay"></div>
+<aside class="cart-drawer" id="cartDrawer"><button class="drawer-close" id="cartCloseBtn" aria-label="Close cart">&times;</button><h3 style="margin-top:6px;">Your Cart</h3><div id="cartItems"></div></aside>
+
+<section class="section">
+  <div class="container">
+    <div class="eyebrow center" style="text-align:center;">Checkout</div>
+    <h1 class="center" style="margin-bottom:36px;">Complete Your Order</h1>
+
+    <div id="checkoutEmpty" style="display:none;text-align:center;">
+      <p style="color:var(--ink-soft);">Your cart is empty — there's nothing to check out yet.</p>
+      <a href="shop.html" class="btn btn-solid" style="margin-top:10px;">Browse the Shop</a>
+    </div>
+
+    <div id="checkoutWrap" class="split" style="align-items:flex-start;">
+      <div>
+        <div style="background:var(--card);border:1px solid var(--line);border-radius:3px;padding:24px;margin-bottom:20px;">
+          <h4 style="margin-top:0;">Order Summary</h4>
+          <div id="orderItems"></div>
+          <div style="border-top:1px solid var(--line);margin-top:14px;padding-top:14px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span>Subtotal</span><span id="ckSubtotal">&#8377;0</span></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px;color:var(--ink-soft);font-size:.88rem;"><span>Shipping</span><span>Calculated at dispatch</span></div>
+            <div style="display:flex;justify-content:space-between;font-family:var(--f-label);letter-spacing:.06em;margin-top:8px;"><span>Total</span><span id="ckTotal">&#8377;0</span></div>
+          </div>
+        </div>
+
+        <div style="background:var(--card);border:1px solid var(--line);border-radius:3px;padding:24px;">
+          <h4 style="margin-top:0;">Have a Coupon?</h4>
+          <div class="inline-form" style="display:flex;gap:10px;">
+            <input id="couponInput" placeholder="Enter coupon code" style="flex:1;padding:12px 14px;border:1px solid var(--line);border-radius:2px;">
+            <button class="btn btn-sm btn-solid" id="applyCouponBtn" type="button">Apply</button>
+          </div>
+          <p class="helper-text" id="couponMsg"></p>
+        </div>
+      </div>
+
+      <div>
+        <div style="background:var(--card);border:1px solid var(--line);border-radius:3px;padding:24px;margin-bottom:20px;">
+          <h4 style="margin-top:0;">Delivery Address</h4>
+          <div id="addressBlock"></div>
+        </div>
+
+        <div style="background:var(--card);border:1px solid var(--line);border-radius:3px;padding:24px;">
+          <h4 style="margin-top:0;">Payment Method</h4>
+          <p class="helper-text" style="margin-top:0;margin-bottom:14px;">A real payment gateway (e.g. Razorpay, PayU, or Stripe) plugs in right here once you're ready to accept live payments — see README.md. The options below are placeholders so you can preview the checkout flow.</p>
+          <div id="paymentOptions"></div>
+          <button class="btn btn-solid btn-block" id="placeOrderBtn" style="margin-top:20px;">Place Order (Demo)</button>
+          <p class="helper-text center" style="text-align:center;">No payment will actually be charged — this is a design preview.</p>
+        </div>
+
+        <div id="orderConfirmed" style="display:none;text-align:center;background:var(--card);border:1px solid var(--gold);border-radius:3px;padding:30px;margin-top:20px;">
+          <div class="motif-divider"></div>
+          <h3>Demo Order Placed</h3>
+          <p style="color:var(--ink-soft);">This confirms the checkout flow works end to end. Once a real payment gateway and order backend are connected, this is where the customer would see their actual order number and confirmation email notice.</p>
+          <a href="shop.html" class="btn" style="margin-top:10px;">Continue Shopping</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container"><div class="footer-grid" id="footerContent"></div><div class="footer-bottom">&copy; <span id="footerYear"></span> The Desi Chapter. All rights reserved.</div></div>
+</footer>
+
+<script src="js/content-store.js"></script>
+<script src="js/main.js"></script>
+<script>
+(function(){
+  const C = window.TDC_CONTENT;
+  let discount = 0;
+
+  function renderOrder(){
+    const items = TDC.getCart();
+    if(items.length === 0){
+      document.getElementById('checkoutEmpty').style.display = 'block';
+      document.getElementById('checkoutWrap').style.display = 'none';
+      return;
+    }
+    let subtotal = 0;
+    document.getElementById('orderItems').innerHTML = items.map(i=>{
+      subtotal += i.price*i.qty;
+      return `<div class="cart-item" style="border-bottom:1px solid var(--line);">
+        <div class="thumb pat-${i.palette||'bagru'}"></div>
+        <div class="grow">
+          <div style="font-size:.92rem;font-weight:500;">${i.name}</div>
+          <div style="font-size:.78rem;color:var(--ink-soft);">Size ${i.size} &middot; Qty ${i.qty}</div>
+        </div>
+        <div style="font-size:.9rem;color:var(--indigo);">&#8377;${i.price*i.qty}</div>
+      </div>`;
+    }).join('');
+    const total = Math.max(0, subtotal - discount);
+    document.getElementById('ckSubtotal').textContent = '\u20B9' + subtotal;
+    document.getElementById('ckTotal').textContent = '\u20B9' + total;
+  }
+
+  function renderAddress(){
+    const cust = JSON.parse(localStorage.getItem('tdc_current_customer') || 'null');
+    const block = document.getElementById('addressBlock');
+    if(!cust){
+      block.innerHTML = `<p style="color:var(--ink-soft);">You're checking out as a guest. <a href="login.html" style="color:var(--rust);">Log in</a> to use a saved address, or continue with a guest address on the next step once a backend is connected.</p>`;
+      return;
+    }
+    const a = cust.address || {};
+    block.innerHTML = `
+      <p style="margin:0 0 6px;font-weight:600;">${cust.name || 'Guest'}</p>
+      <p style="margin:0;color:var(--ink-soft);">${[a.line1,a.line2,a.landmark,a.city,a.state,a.pincode,a.country].filter(Boolean).join(', ') || 'No address on file yet.'}</p>
+      <p style="margin:10px 0 0;">${cust.phone ? '+91 '+cust.phone : ''}</p>
+      <a href="account.html" style="color:var(--rust);font-size:.85rem;">Edit address</a>`;
+  }
+
+  function renderPaymentOptions(){
+    const methods = [
+      { key:'card', label:'Credit / Debit Card' },
+      { key:'upi', label:'UPI (GPay, PhonePe, Paytm)' },
+      { key:'netbanking', label:'Net Banking' },
+      { key:'cod', label:'Cash on Delivery — not yet available' }
+    ];
+    document.getElementById('paymentOptions').innerHTML = methods.map((m,i)=>`
+      <label style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--line);border-radius:3px;margin-bottom:8px;opacity:${m.key==='cod'?'.5':'1'};cursor:${m.key==='cod'?'not-allowed':'pointer'};">
+        <input type="radio" name="paymentMethod" value="${m.key}" ${i===0?'checked':''} ${m.key==='cod'?'disabled':''} style="width:auto;">
+        <span>${m.label}</span>
+      </label>`).join('');
+  }
+
+  document.getElementById('applyCouponBtn').addEventListener('click', ()=>{
+    const code = document.getElementById('couponInput').value.trim().toUpperCase();
+    const coupon = C.coupons.find(c=>c.code===code && c.active);
+    const msg = document.getElementById('couponMsg');
+    if(!coupon){ msg.textContent = "That code isn't valid or has expired."; discount = 0; renderOrder(); return; }
+    const items = TDC.getCart();
+    const subtotal = items.reduce((s,i)=>s+i.price*i.qty,0);
+    discount = coupon.type === 'percent' ? Math.round(subtotal * coupon.value/100) : coupon.value;
+    msg.textContent = `Applied ${coupon.code} — ${coupon.note || ''}`;
+    renderOrder();
+  });
+
+  document.getElementById('placeOrderBtn').addEventListener('click', ()=>{
+    document.getElementById('orderConfirmed').style.display = 'block';
+    document.getElementById('placeOrderBtn').disabled = true;
+    document.getElementById('orderConfirmed').scrollIntoView({behavior:'smooth'});
+  });
+
+  renderOrder();
+  renderAddress();
+  renderPaymentOptions();
+})();
+</script>
+</body>
+</html>

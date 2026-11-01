@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Account — The Desi Chapter</title>
+<link rel="icon" href="assets/logo.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="marquee-bar"><div class="marquee-track" id="marqueeTrack"></div></div>
+<div class="util-nav">
+  <button onclick="history.back()">&larr; Back</button>
+  <a href="index.html">&#8962; Home</a>
+</div>
+<header class="site-header">
+  <div class="header-row">
+    <div class="header-side left"><button class="hamburger" id="menuBtn" aria-label="Open menu"><span></span><span></span><span></span></button></div>
+    <a href="index.html" class="brand"><img data-brand-logo src="assets/logo.png" alt="The Desi Chapter" style="height:40px;"></a>
+    <div class="header-side right">
+      <a class="icon-link" href="login.html" title="Login"><svg viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 100-8 4 4 0 000 8zM4 20c0-4 4-6 8-6s8 2 8 6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <button class="icon-link" id="cartBtn" style="background:none;border:none;"><svg viewBox="0 0 24 24" fill="none"><path d="M6 6h15l-1.5 9h-12z" stroke="currentColor" stroke-linejoin="round"/><path d="M6 6L5 3H2" stroke="currentColor" stroke-linecap="round"/><circle cx="9" cy="20" r="1.4" fill="currentColor"/><circle cx="18" cy="20" r="1.4" fill="currentColor"/></svg><span class="cart-count">0</span></button>
+      <a class="icon-link" href="contact.html" title="Contact"><svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16v14H4z" stroke="currentColor"/><path d="M4 6l8 7 8-7" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    </div>
+  </div>
+</header>
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<aside class="drawer" id="navDrawer">
+  <button class="drawer-close" id="drawerCloseBtn" aria-label="Close menu">&times;</button>
+  <div class="brand" style="margin-bottom:30px;"><img data-brand-logo src="assets/logo.png" style="height:52px;" alt=""></div>
+  <nav><ul id="drawerMenu"></ul></nav>
+</aside>
+<div class="drawer-overlay" id="cartOverlay"></div>
+<aside class="cart-drawer" id="cartDrawer"><button class="drawer-close" id="cartCloseBtn" aria-label="Close cart">&times;</button><h3 style="margin-top:6px;">Your Cart</h3><div id="cartItems"></div></aside>
+
+<div class="auth-wrap">
+  <div class="auth-card" style="max-width:520px;">
+    <div class="center" style="margin-bottom:22px;">
+      <div class="eyebrow">Join The Chapter</div>
+      <h2 style="margin-bottom:0;">Create Your Account</h2>
+    </div>
+
+    <!-- STEP 1: DETAILS -->
+    <form id="detailsForm" data-step="1">
+      <div class="field"><label for="fullName">Full Name</label><input id="fullName" required placeholder="e.g. Ananya Sharma"></div>
+      <div class="field"><label for="email">Email Address</label><input id="email" type="email" required placeholder="you@example.com"></div>
+      <div class="field"><label for="phone">Phone Number</label><input id="phone" type="tel" required placeholder="10-digit mobile number" pattern="[0-9]{10}" maxlength="10"></div>
+      <div class="field"><label for="password">Create Password</label><input id="password" type="password" required minlength="6" placeholder="At least 6 characters"></div>
+
+      <div class="eyebrow" style="margin:22px 0 10px;">Delivery Address <span style="color:var(--ink-soft);text-transform:none;letter-spacing:0;font-family:var(--f-body);font-size:.78rem;">(in the format our shipping partner requires)</span></div>
+      <div class="field"><label for="addr1">Address Line 1 (Flat / House No., Building)</label><input id="addr1" required></div>
+      <div class="field"><label for="addr2">Address Line 2 (Street / Area)</label><input id="addr2"></div>
+      <div class="field"><label for="landmark">Landmark (optional)</label><input id="landmark"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div class="field"><label for="city">City</label><input id="city" required></div>
+        <div class="field"><label for="state">State</label><input id="state" required></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div class="field"><label for="pincode">Pincode</label><input id="pincode" required pattern="[0-9]{6}" maxlength="6"></div>
+        <div class="field"><label for="country">Country</label><input id="country" value="India" required></div>
+      </div>
+
+      <button class="btn btn-solid btn-block" type="submit">Send OTP to Verify Phone</button>
+      <p class="switch-row">Already have an account? <a href="login.html" style="color:var(--rust);text-decoration:underline;">Log in</a></p>
+    </form>
+
+    <!-- STEP 2: OTP -->
+    <form id="otpForm" data-step="2" style="display:none;">
+      <div class="alert alert-success" id="otpDemoNote"></div>
+      <p style="color:var(--ink-soft);font-size:.88rem;margin-bottom:16px;">Enter the 4-digit code sent to <strong id="otpPhoneDisplay"></strong> to verify your account.</p>
+      <div class="otp-boxes">
+        <input maxlength="1" inputmode="numeric">
+        <input maxlength="1" inputmode="numeric">
+        <input maxlength="1" inputmode="numeric">
+        <input maxlength="1" inputmode="numeric">
+      </div>
+      <p class="helper-text center" style="text-align:center;">Didn't get it? <a href="#" id="resendOtp">Resend OTP</a></p>
+      <button class="btn btn-solid btn-block" style="margin-top:10px;" type="submit">Verify &amp; Create Account</button>
+      <p class="alert alert-error" id="otpError" style="display:none;margin-top:14px;">That code didn't match. Please try again.</p>
+    </form>
+
+    <!-- STEP 3: SUCCESS -->
+    <div id="successPanel" style="display:none;text-align:center;">
+      <div class="motif-divider"></div>
+      <h3>Welcome to The Desi Chapter</h3>
+      <p style="color:var(--ink-soft);">Your account and delivery address are saved. You can now shop and check out faster.</p>
+      <a href="account.html" class="btn btn-solid" style="margin-top:14px;">Go to My Account</a>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container"><div class="footer-grid" id="footerContent"></div><div class="footer-bottom">&copy; <span id="footerYear"></span> The Desi Chapter. All rights reserved.</div></div>
+</footer>
+
+<script src="js/content-store.js"></script>
+<script src="js/main.js"></script>
+<script>
+(function(){
+  let pendingOtp = null;
+  let pendingCustomer = null;
+
+  function genOtp(){ return String(Math.floor(1000 + Math.random()*9000)); }
+
+  document.getElementById('detailsForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    pendingCustomer = {
+      name: fullName.value.trim(), email: email.value.trim(), phone: phone.value.trim(),
+      address: {
+        line1: addr1.value.trim(), line2: addr2.value.trim(), landmark: landmark.value.trim(),
+        city: city.value.trim(), state: state.value.trim(), pincode: pincode.value.trim(), country: country.value.trim()
+      },
+      passwordHash: btoa(password.value) // demo only — a real backend must use proper salted hashing (e.g. bcrypt), never store or transmit plain text passwords.
+    };
+    pendingOtp = genOtp();
+    document.getElementById('otpPhoneDisplay').textContent = '+91 ' + pendingCustomer.phone;
+    document.getElementById('otpDemoNote').textContent =
+      'Demo mode: no SMS gateway is connected yet, so here is your OTP — ' + pendingOtp + '. Once you connect a provider like MSG91 or Twilio Verify on the backend, this will arrive by real SMS instead.';
+    document.getElementById('detailsForm').style.display = 'none';
+    document.getElementById('otpForm').style.display = 'block';
+    document.querySelectorAll('#otpForm .otp-boxes input')[0].focus();
+  });
+
+  // auto-advance OTP boxes
+  const boxes = document.querySelectorAll('#otpForm .otp-boxes input');
+  boxes.forEach((b,i)=>{
+    b.addEventListener('input', ()=>{ if(b.value && boxes[i+1]) boxes[i+1].focus(); });
+  });
+
+  document.getElementById('resendOtp').addEventListener('click', function(e){
+    e.preventDefault();
+    pendingOtp = genOtp();
+    document.getElementById('otpDemoNote').textContent = 'New demo OTP sent — ' + pendingOtp + '.';
+  });
+
+  document.getElementById('otpForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    const entered = Array.from(boxes).map(b=>b.value).join('');
+    if(entered.length===4 && entered === pendingOtp){
+      const customers = JSON.parse(localStorage.getItem('tdc_customers')||'[]');
+      customers.push(pendingCustomer);
+      localStorage.setItem('tdc_customers', JSON.stringify(customers));
+      localStorage.setItem('tdc_current_customer', JSON.stringify(pendingCustomer));
+      document.getElementById('otpForm').style.display='none';
+      document.getElementById('successPanel').style.display='block';
+    } else {
+      document.getElementById('otpError').style.display='block';
+    }
+  });
+})();
+</script>
+</body>
+</html>

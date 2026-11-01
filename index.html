@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Desi Chapter — Rooted in Tradition, Made for Today</title>
+<meta name="description" content="Everyday Indian clothing in Bagru, Dabu, Ajrakh and Kantha prints. Nazar-protected labels. A portion of every sale supports street dog welfare.">
+<link rel="icon" href="assets/logo.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="marquee-bar"><div class="marquee-track" id="marqueeTrack"></div></div>
+
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<aside class="drawer" id="navDrawer">
+  <button class="drawer-close" id="drawerCloseBtn" aria-label="Close menu">&times;</button>
+  <div class="brand" style="margin-bottom:30px;"><img data-brand-logo src="assets/logo.png" style="height:52px;" alt=""></div>
+  <nav><ul id="drawerMenu"></ul></nav>
+</aside>
+
+<div class="drawer-overlay" id="cartOverlay"></div>
+<aside class="cart-drawer" id="cartDrawer">
+  <button class="drawer-close" id="cartCloseBtn" aria-label="Close cart">&times;</button>
+  <h3 style="margin-top:6px;">Your Cart</h3>
+  <div id="cartItems"></div>
+</aside>
+
+<!-- HERO (merged with top bar) -->
+<section class="hero-merged">
+  <div class="container">
+    <div class="hero-topbar">
+      <button class="hamburger" id="menuBtn" aria-label="Open menu"><span></span><span></span><span></span></button>
+      <div class="hero-icons">
+        <a class="icon-link" href="login.html" title="Login">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 100-8 4 4 0 000 8zM4 20c0-4 4-6 8-6s8 2 8 6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <button class="icon-link" id="cartBtn" style="background:none;border:none;">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M6 6h15l-1.5 9h-12z" stroke="currentColor" stroke-linejoin="round"/><path d="M6 6L5 3H2" stroke="currentColor" stroke-linecap="round"/><circle cx="9" cy="20" r="1.4" fill="currentColor"/><circle cx="18" cy="20" r="1.4" fill="currentColor"/></svg>
+          <span class="cart-count">0</span>
+        </button>
+        <a class="icon-link" href="contact.html" title="Contact">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16v14H4z" stroke="currentColor"/><path d="M4 6l8 7 8-7" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+  <img src="assets/logo.png" alt="The Desi Chapter — Rooted in tradition, made for today" class="hero-logo-full">
+</section>
+
+<!-- FEATURED PRODUCTS (combined with Made-With-Love intro) -->
+<section class="section promo-banner">
+  <div class="container">
+    <div class="center" style="margin-bottom:40px;">
+      <div class="eyebrow" id="promoEyebrow">Made With Love <svg viewBox="0 0 24 24" fill="none" style="width:14px;height:14px;display:inline;vertical-align:-2px;"><path d="M12 20.5s-7.5-4.9-10-9.6C.5 7.6 2.3 4 5.8 4c2 0 3.6 1.1 4.6 2.6C11.4 5.1 13 4 15 4c3.5 0 5.3 3.6 3.8 6.9-2.5 4.7-10 9.6-10 9.6z" fill="#96402C"/></svg></div>
+      <h2 id="promoHeading" class="script">Where Tradition Meets You, Every Day</h2>
+      <p id="promoSubtext">Rooted. Expressive. A little nostalgic, a little bold.</p>
+    </div>
+    <div class="grid grid-4" id="featuredGrid"></div>
+    <div class="center" style="margin-top:40px;">
+      <a href="shop.html" id="promoCta" class="btn btn-solid">Shop Now</a>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BADGES -->
+<section class="trust-strip">
+  <div class="container">
+    <div class="row" id="trustRow"></div>
+  </div>
+</section>
+
+<!-- OUR STORY (includes Nazar Protection callout) -->
+<section class="story-navy" id="our-story">
+  <div class="frame-rule frame-rule-color"></div>
+  <div class="container center">
+    <div class="eyebrow" id="storyEyebrow" style="color:var(--gold);">Our Story</div>
+    <h2 id="storyHeading" style="color:var(--ivory);max-width:760px;margin:0 auto 18px;">A Love Letter From India, Stitched by Karigars</h2>
+    <div class="motif-divider"><svg viewBox="0 0 24 24" fill="var(--gold)"><circle cx="4" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="20" cy="12" r="2"/></svg></div>
+    <p id="storyPullQuote" class="story-pullquote"></p>
+    <p id="storyBody" class="story-bodytext"></p>
+    <div class="nazar-callout" id="nazar">
+      <svg viewBox="0 0 100 100" style="width:40px;height:40px;flex-shrink:0;">
+        <circle cx="50" cy="50" r="34" fill="#1E3A52" stroke="#B98A34" stroke-width="2"/>
+        <circle cx="50" cy="50" r="22" fill="#2E5A82"/>
+        <circle cx="50" cy="50" r="11" fill="#F4EBD8"/>
+        <circle cx="50" cy="50" r="5" fill="#1E3A52"/>
+      </svg>
+      <div>
+        <div class="small-caps" id="nazarLabel" style="color:var(--gold);margin-bottom:4px;">Nazar Protection</div>
+        <p id="nazarBody"></p>
+      </div>
+    </div>
+    <div class="craft-tags" id="craftTagsRow"></div>
+  </div>
+</section>
+
+<!-- WELFARE INTEREST -->
+<section class="section welfare-section" id="welfare">
+  <div class="container center">
+    <div class="welfare-title-row">
+      <svg viewBox="0 0 200 190" style="width:130px;flex-shrink:0;">
+        <path d="M160 130 Q182 118 178 96 Q170 108 156 112" fill="#DDAE6A" stroke="#8a5a2e" stroke-width="1.6" stroke-linejoin="round"/>
+        <ellipse cx="100" cy="148" rx="34" ry="22" fill="#E3AE6C" stroke="#8a5a2e" stroke-width="1.8"/>
+        <ellipse cx="82" cy="168" rx="11" ry="8" fill="#EFC38A" stroke="#8a5a2e" stroke-width="1.5"/>
+        <ellipse cx="118" cy="168" rx="11" ry="8" fill="#EFC38A" stroke="#8a5a2e" stroke-width="1.5"/>
+        <path d="M70 55 Q28 60 24 108 Q28 138 60 128 Q46 105 52 80 Q58 64 70 55Z" fill="#C1793B" stroke="#8a5a2e" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M130 55 Q172 60 176 108 Q172 138 140 128 Q154 105 148 80 Q142 64 130 55Z" fill="#C1793B" stroke="#8a5a2e" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M64 70 Q42 78 42 105 Q46 120 58 118 Q50 100 56 82Z" fill="#a5652f" opacity="0.55"/>
+        <path d="M136 70 Q158 78 158 105 Q154 120 142 118 Q150 100 144 82Z" fill="#a5652f" opacity="0.55"/>
+        <circle cx="100" cy="82" r="58" fill="#EFC38A" stroke="#8a5a2e" stroke-width="1.8"/>
+        <ellipse cx="64" cy="98" rx="10" ry="7" fill="#F2A98C" opacity="0.75"/>
+        <ellipse cx="136" cy="98" rx="10" ry="7" fill="#F2A98C" opacity="0.75"/>
+        <ellipse cx="100" cy="102" rx="28" ry="19" fill="#FBEBD3" stroke="#8a5a2e" stroke-width="1.6"/>
+        <ellipse cx="100" cy="93" rx="7.5" ry="6" fill="#3b2a1e"/>
+        <path d="M90 104 Q100 111 110 104" stroke="#8a5a2e" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+        <ellipse cx="100" cy="110" rx="5" ry="4" fill="#E8879A"/>
+        <circle cx="74" cy="76" r="10.5" fill="#2B241C"/>
+        <circle cx="126" cy="76" r="10.5" fill="#2B241C"/>
+        <circle cx="78" cy="71" r="3.4" fill="#fff"/>
+        <circle cx="130" cy="71" r="3.4" fill="#fff"/>
+        <circle cx="70" cy="80" r="1.6" fill="#fff" opacity="0.8"/>
+        <circle cx="122" cy="80" r="1.6" fill="#fff" opacity="0.8"/>
+        <path d="M62 58 Q74 51 86 58" stroke="#8a5a2e" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M114 58 Q126 51 138 58" stroke="#8a5a2e" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <g transform="translate(128,106) rotate(18)">
+          <line x1="0" y1="0" x2="30" y2="10" stroke="#5a8a52" stroke-width="2.6" stroke-linecap="round"/>
+          <g transform="translate(35,12)">
+            <circle cx="-7" cy="-7" r="7" fill="#EF93A8"/>
+            <circle cx="7" cy="-7" r="7" fill="#EF93A8"/>
+            <circle cx="-7" cy="7" r="7" fill="#EF93A8"/>
+            <circle cx="7" cy="7" r="7" fill="#EF93A8"/>
+            <circle cx="0" cy="0" r="6.5" fill="#F7CE54"/>
+          </g>
+        </g>
+      </svg>
+      <div style="text-align:left;">
+        <div class="eyebrow" id="welfareEyebrow">Welfare Interest</div>
+        <h2 id="welfareHeading" style="margin-bottom:0;">Every piece looks after a street dog too</h2>
+      </div>
+    </div>
+    <p id="welfareBody" style="max-width:620px;margin:18px auto 0;color:var(--ink-soft);"></p>
+  </div>
+</section>
+
+<!-- CRAFT LEGACY -->
+<section class="section">
+  <div class="container">
+    <div class="center" style="margin-bottom:40px;">
+      <div class="eyebrow">The Crafts Behind The Chapter</div>
+      <h2>Bagru &middot; Dabu &middot; Ajrakh &middot; Kantha</h2>
+    </div>
+    <div class="grid grid-4" id="craftsGrid"></div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="section">
+  <div class="container">
+    <div class="center" style="margin-bottom:40px;">
+      <div class="eyebrow">In Their Words</div>
+      <h2>From Our Customers</h2>
+    </div>
+    <div class="grid grid-3" id="reviewsGrid"></div>
+  </div>
+</section>
+
+<!-- CUSTOM ADMIN-ADDED SECTIONS -->
+<div id="customSectionsWrap"></div>
+
+<!-- NEWSLETTER -->
+<section class="section newsletter">
+  <div class="frame-rule-color" style="top:0;"></div>
+  <div class="container">
+    <h2>Join the Next Chapter</h2>
+    <div class="motif-divider"><svg viewBox="0 0 24 24" fill="var(--gold)"><circle cx="4" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="20" cy="12" r="2"/></svg></div>
+    <p style="color:#f6e5da;">New drops, region stories and the odd discount — straight to your inbox.</p>
+    <form class="newsletter-form" id="newsletterForm">
+      <input type="email" placeholder="your@email.com" required>
+      <button type="submit">Subscribe</button>
+    </form>
+    <p class="helper-text" id="newsletterMsg" style="color:#f6e5da;"></p>
+  </div>
+  <div class="frame-rule-color" style="top:auto;bottom:0;"></div>
+</section>
+
+<!-- INSTAGRAM -->
+<section class="section-tight">
+  <div class="container">
+    <div class="center" style="margin-bottom:26px;">
+      <div class="eyebrow">Follow Along</div>
+      <h2>@thedesichapter</h2>
+      <a id="instaLink" href="#" target="_blank" rel="noopener" class="btn btn-sm" style="margin-top:10px;">Visit Instagram</a>
+    </div>
+    <div class="insta-grid" id="instaGrid"></div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid" id="footerContent"></div>
+    <div class="footer-bottom">&copy; <span id="footerYear"></span> The Desi Chapter. All rights reserved.</div>
+  </div>
+</footer>
+
+<script src="js/content-store.js"></script>
+<script src="js/main.js"></script>
+<script src="js/home.js"></script>
+</body>
+</html>
