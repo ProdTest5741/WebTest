@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — The Desi Chapter</title>
+<link rel="icon" href="../assets/logo.png">
+<link rel="stylesheet" href="../css/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  body{ background:var(--ivory-deep); }
+  .admin-shell{ display:flex; min-height:100vh; }
+  .admin-side{
+    width:250px; background:var(--indigo-deep); color:#dfe6ea; flex-shrink:0; padding:26px 18px;
+  }
+  .admin-side .brand-a{ display:flex; align-items:center; gap:10px; margin-bottom:30px; }
+  .admin-side .brand-a img{ height:32px; }
+  .admin-side .brand-a span{ font-family:var(--f-display); color:#fff; }
+  .admin-nav button{
+    display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:none; border:none;
+    color:#c3ccd1; padding:11px 12px; border-radius:4px; font-size:.86rem; margin-bottom:2px;
+  }
+  .admin-nav button.active, .admin-nav button:hover{ background:rgba(255,255,255,.08); color:#fff; }
+  .admin-main{ flex:1; padding:34px 40px; overflow-x:hidden; }
+  .admin-topbar{ display:flex; justify-content:space-between; align-items:center; margin-bottom:26px; }
+  .admin-card{ background:#fff; border:1px solid var(--line); border-radius:6px; padding:22px 24px; }
+  .kpi-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:18px; margin-bottom:26px; }
+  .kpi{ background:#fff; border:1px solid var(--line); border-radius:6px; padding:18px 20px; }
+  .kpi .num{ font-family:var(--f-display); font-size:1.7rem; color:var(--indigo); }
+  .kpi .lbl{ font-size:.75rem; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em; }
+  .chart-grid{ display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
+  .chart-box{ background:#fff; border:1px solid var(--line); border-radius:6px; padding:20px; }
+  .chart-box h4{ margin-top:0; font-size:.95rem; }
+  table.admin-table{ width:100%; border-collapse:collapse; font-size:.86rem; }
+  table.admin-table th, table.admin-table td{ text-align:left; padding:10px 8px; border-bottom:1px solid var(--line); }
+  table.admin-table th{ color:var(--ink-soft); text-transform:uppercase; font-size:.7rem; letter-spacing:.06em; }
+  .tag{ padding:2px 9px; border-radius:10px; font-size:.7rem; }
+  .tag-ok{ background:#dfe7df; color:#345c3a; }
+  .tag-out{ background:#f3ddd8; color:#8a3b2c; }
+  .tag-mto{ background:#eadfc3; color:#8a5a1e; }
+  .panel{ display:none; }
+  .panel.active{ display:block; }
+  .inline-form{ display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin-bottom:16px; align-items:end; }
+  .small-btn-row{ display:flex; gap:8px; }
+  .color-row{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+  .color-row input[type=color]{ width:44px; height:34px; border:none; background:none; padding:0; }
+  .note-box{ background:#fbf3e4; border:1px solid var(--gold); border-radius:4px; padding:12px 16px; font-size:.82rem; color:#6b5225; margin-bottom:20px; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN GATE -->
+<div id="adminLoginWrap" class="auth-wrap" style="min-height:100vh;background:var(--ivory);">
+  <div class="auth-card">
+    <div class="center" style="margin-bottom:20px;">
+      <img src="../assets/logo.png" style="height:44px;margin:0 auto 12px;">
+      <div class="eyebrow">Admin</div>
+      <h2 style="margin-bottom:0;">Dashboard Login</h2>
+    </div>
+    <form id="adminLoginForm">
+      <div class="field"><label for="adminUser">Username</label><input id="adminUser" required></div>
+      <div class="field"><label for="adminPass">Password</label><input id="adminPass" type="password" required></div>
+      <button class="btn btn-solid btn-block" type="submit">Log In</button>
+      <p class="alert alert-error" id="adminLoginErr" style="display:none;margin-top:14px;">Incorrect username or password.</p>
+    </form>
+    <p class="helper-text" style="margin-top:18px;">Demo credentials: <strong>admin</strong> / <strong>admin123</strong>. Change this immediately in Settings, and replace this with real server-side authentication before going live — see README.md.</p>
+  </div>
+</div>
+
+<!-- ADMIN SHELL -->
+<div id="adminShell" class="admin-shell" style="display:none;">
+  <aside class="admin-side">
+    <div class="brand-a"><img src="../assets/logo.png"><span>Admin</span></div>
+    <nav class="admin-nav">
+      <button data-p="overview" class="active">&#9670; Sales Analytics</button>
+      <button data-p="products">&#9670; Products</button>
+      <button data-p="categories">&#9670; Categories &amp; Collections</button>
+      <button data-p="coupons">&#9670; Coupons &amp; Discounts</button>
+      <button data-p="content">&#9670; Homepage Content</button>
+      <button data-p="policies">&#9670; Policy Pages</button>
+      <button data-p="menu">&#9670; Menu &amp; Settings</button>
+      <button data-p="theme">&#9670; Colours &amp; Theme</button>
+      <button data-p="reviews">&#9670; Customer Reviews</button>
+    </nav>
+    <div style="margin-top:30px;border-top:1px solid rgba(255,255,255,.15);padding-top:16px;">
+      <a href="../index.html" style="color:#c3ccd1;font-size:.82rem;display:block;margin-bottom:10px;">&larr; View Live Site</a>
+      <button id="adminLogout" style="background:none;border:none;color:#e2a99a;font-size:.82rem;padding:0;">Log Out</button>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div>
+        <div class="eyebrow">The Desi Chapter</div>
+        <h2 style="margin-bottom:0;" id="panelTitle">Sales Analytics</h2>
+      </div>
+    </div>
+
+    <!-- OVERVIEW / ANALYTICS -->
+    <section class="panel active" id="panel-overview">
+      <div class="note-box">These charts use sample data to show what the dashboard will display. Connect a real orders database and this view will update automatically — see README.md "Going from prototype to production".</div>
+      <div class="kpi-row" id="kpiRow"></div>
+      <div class="chart-grid">
+        <div class="chart-box"><h4>Best-Selling Products</h4><canvas id="chartProducts" height="220"></canvas></div>
+        <div class="chart-box"><h4>Sales by Region</h4><canvas id="chartRegion" height="220"></canvas></div>
+      </div>
+      <div class="chart-grid">
+        <div class="chart-box"><h4>Customer Age Range</h4><canvas id="chartAge" height="220"></canvas></div>
+        <div class="chart-box"><h4>Customer Gender Split</h4><canvas id="chartGender" height="220"></canvas></div>
+      </div>
+      <div class="chart-box"><h4>Monthly Revenue Trend</h4><canvas id="chartTrend" height="90"></canvas></div>
+    </section>
+
+    <!-- PRODUCTS -->
+    <section class="panel" id="panel-products">
+      <div class="admin-card">
+        <h4 style="margin-top:0;">Add / Edit Product</h4>
+        <form id="productForm" class="inline-form">
+          <input type="hidden" id="pf-id">
+          <div><label class="small-caps">Name</label><input id="pf-name" required></div>
+          <div><label class="small-caps">Craft Collection</label><select id="pf-collection"></select></div>
+          <div><label class="small-caps">Merch Category</label><select id="pf-category"></select></div>
+          <div><label class="small-caps">Sub-Collection</label><select id="pf-subcollection"></select></div>
+          <div><label class="small-caps">Gender</label><select id="pf-gender"><option>Women</option><option>Men</option><option>Unisex</option></select></div>
+          <div><label class="small-caps">Region</label><input id="pf-region"></div>
+          <div><label class="small-caps">Price (&#8377;)</label><input id="pf-price" type="number" required></div>
+          <div><label class="small-caps">MRP (&#8377;)</label><input id="pf-mrp" type="number"></div>
+          <div>
+            <label class="small-caps">Availability</label>
+            <select id="pf-availability">
+              <option value="available">Available (ships now)</option>
+              <option value="out">Out of Stock</option>
+              <option value="preorder">Pre-order</option>
+              <option value="made-to-order">Made to Order</option>
+            </select>
+          </div>
+          <div><label class="small-caps">Sizes (comma sep.)</label><input id="pf-sizes" value="S,M,L,XL"></div>
+          <div><label class="small-caps">Size Guide</label><select id="pf-sizeguide"></select></div>
+          <div style="grid-column:1/-1;">
+            <label class="small-caps">Product Image</label>
+            <input id="pf-image" type="file" accept="image/*">
+            <img id="pf-image-preview" style="display:none;max-height:120px;margin-top:8px;border-radius:3px;">
+            <button type="button" id="pf-image-clear" class="btn btn-sm" style="display:none;margin-top:6px;">Remove Image</button>
+          </div>
+          <div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;">
+            <input type="checkbox" id="pf-featured" style="width:auto;">
+            <label for="pf-featured" style="margin:0;font-size:.85rem;">Show this product on the homepage</label>
+          </div>
+          <div style="grid-column:1/-1;"><label class="small-caps">Description</label><textarea id="pf-desc" rows="2" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:2px;"></textarea></div>
+          <div class="small-btn-row" style="grid-column:1/-1;">
+            <button class="btn btn-solid btn-sm" type="submit">Save Product</button>
+            <button class="btn btn-sm" type="button" id="pf-clear">Clear Form</button>
+          </div>
+        </form>
+      </div>
+      <div class="admin-card" style="margin-top:20px;">
+        <table class="admin-table" id="productsTable"></table>
+      </div>
+      <div class="admin-card" style="margin-top:20px;">
+        <h4 style="margin-top:0;">Size Guide Charts</h4>
+        <p class="helper-text">Upload one chart per product line (e.g. Women's Kurta Sizing, Men's Shirt Sizing once those styles launch). Pick which chart applies to each product from the "Size Guide" field above.</p>
+        <div id="sizeGuidesEditor"></div>
+        <div class="inline-form" style="margin-top:10px;">
+          <input id="newSizeGuideName" placeholder="Chart name, e.g. Women's Kurta Sizing">
+          <input id="newSizeGuideImage" type="file" accept="image/*">
+          <button class="btn btn-sm btn-solid" type="button" id="addSizeGuideBtn">+ Add Size Guide</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CATEGORIES -->
+<section class="panel" id="panel-categories">
+      <div class="admin-card">
+        <h4 style="margin-top:0;">Craft Chapters (Our Story cards)</h4>
+        <p class="helper-text">Each chapter is one craft's card in the "Crafts Behind The Chapter" section — Bagru, Dabu, Ajrakh, Kantha and so on. Add a new chapter for a future launch, edit an existing one, add an optional longer story, or remove a chapter entirely.</p>
+        <div id="craftsEditor"></div>
+        <button class="btn btn-solid btn-sm" type="button" id="addCraftBtn" style="margin-top:10px;">+ Add New Chapter</button>
+      </div>
+
+      <div class="admin-card" style="margin-top:20px;">
+        <h4 style="margin-top:0;">Craft Print Collections (shop filter chips)</h4>
+        <p class="helper-text">The filter chips on the shop page (Bagru, Dabu, Ajrakh, Kantha...).</p>
+        <div class="inline-form">
+          <input id="newCollection" placeholder="New collection name">
+          <button class="btn btn-solid btn-sm" id="addCollectionBtn" type="button">Add Collection</button>
+        </div>
+        <ul id="collectionList"></ul>
+      </div>
+
+      <div class="admin-card" style="margin-top:20px;">
+        <h4 style="margin-top:0;">Merchandising Categories &amp; Sub-Collections</h4>
+        <p class="helper-text">For organising the catalog as it grows — e.g. <strong>Women</strong> &rarr; Ethnic Wear / Daily Wear / Party Wear / Night Wear, or top-level categories like <strong>Accessories</strong> and <strong>Home Decor</strong>. Add, rename or remove categories and their sub-collections; assign products to them from the Products tab.</p>
+        <div id="merchCategoriesEditor"></div>
+        <div class="inline-form" style="margin-top:10px;">
+          <input id="newMerchCategory" placeholder="New top-level category, e.g. Accessories">
+          <button class="btn btn-sm btn-solid" type="button" id="addMerchCategoryBtn">+ Add Category</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- COUPONS -->
+    <section class="panel" id="panel-coupons">
+      <div class="admin-card">
+        <h4 style="margin-top:0;">Add Coupon</h4>
+        <form id="couponForm" class="inline-form">
+          <div><label class="small-caps">Code</label><input id="cf-code" required style="text-transform:uppercase;"></div>
+          <div><label class="small-caps">Type</label><select id="cf-type"><option value="percent">% Off</option><option value="flat">Flat &#8377; Off</option></select></div>
+          <div><label class="small-caps">Value</label><input id="cf-value" type="number" required></div>
+          <div><label class="small-caps">Note</label><input id="cf-note"></div>
+          <div><button class="btn btn-solid btn-sm" type="submit">Add Coupon</button></div>
+        </form>
+      </div>
+      <div class="admin-card" style="margin-top:20px;">
+        <table class="admin-table" id="couponsTable"></table>
+      </div>
+    </section>
+
+    <!-- CONTENT EDITOR -->
+    <section class="panel" id="panel-content">
+      <div class="note-box">Edits here save to this browser and appear instantly on the live pages you view from it. For edits to be visible to every visitor on every device, move this content into a real backend — see README.md.</div>
+
+      <div class="admin-card" style="margin-bottom:18px;">
+        <h4 style="margin-top:0;">Hero Section</h4>
+        <label class="small-caps">Tagline</label><input id="c-heroTagline" style="width:100%;margin-bottom:10px;">
+      </div>
+
+      <div class="admin-card" style="margin-bottom:18px;">
+        <h4 style="margin-top:0;">Trust Badge Strip</h4>
+        <p class="helper-text">Short labels shown as icon badges under the hero. Add as many as you like.</p>
+        <div id="trustEditor"></div>
+        <div class="inline-form" style="margin-top:10px;">
+          <input id="newTrustLabel" placeholder="Label, e.g. Ethically Sourced">
+          <select id="newTrustIcon">
+            <option value="hand">Hand</option>
+            <option value="house">House</option>
+            <option value="globe">Globe</option>
+            <option value="indiamap">India Map</option>
+            <option value="needle">Woven Knot</option>
+            <option value="heart">Heart</option>
+            <option value="leaf">Leaf</option>
+            <option value="thread">Thread Spool</option>
+          </select>
+          <button class="btn btn-sm btn-solid" type="button" id="addTrustBtn">+ Add Badge</button>
+        </div>
+      </div>
+
+      <div class="admin-card" style="margin-bottom:18px;">
+        <h4 style="margin-top:0;">"Made With Love" Promo Banner</h4>
+        <label class="small-caps">Heading</label><input id="c-promoHeading" style="width:100%;margin-bottom:10px;">
+        <label class="small-caps">Subtext</label><input id="c-promoSubtext" style="width:100%;margin-bottom:10px;">
+        <label class="small-caps">Button Label</label><input id="c-promoCta" style="width:100%;">
+      </div>
+
+      <div class="admin-card" style="margin-bottom:18px;">
+        <h4 style="margin-top:0;">Our Story</h4>
+        <label class="small-caps">Heading</label><input id="c-storyHeading" style="width:100%;margin-bottom:10px;">
+        <label class="small-caps">Pull Quote (large italic line)</label><input id="c-storyPullQuote" style="width:100%;margin-bottom:10px;">
+        <label class="small-caps">Body</label><textarea id="c-storyBody" rows="5" style="width:100%;"></textarea>
+      </div>
+
+      <div class="admin-card" style="margin-bottom:18px;">
+        <h4 style="margin-top:0;">Nazar Protection (callout inside Our Story)</h4>
+        <label class="small-caps">Callout Text</label><textarea id="c-nazarBody" rows="4" style="width:100%;"></textarea>
+      </div>
+
+      <div class="admin-card" style="margin-bottom:18px;">
+        <h4 style="margin-top:0;">Welfare Interest</h4>
+        <label class="small-caps">Heading</label><input id="c-welfareHeading" style="width:100%;margin-bottom:10px;">
+        <label class="small-caps">Body</label><textarea id="c-welfareBody" rows="4" style="width:100%;"></textarea>
+      </div>
+
+      <div class="admin-card" style="margin-bottom:18px;">
+        <h4 style="margin-top:0;">Product Page Info (shown on every product)</h4>
+        <label class="small-caps">Shipping &amp; Returns Text</label><textarea id="c-shippingReturnsText" rows="2" style="width:100%;margin-bottom:10px;"></textarea>
+        <label class="small-caps">Fabric &amp; Care Text</label><textarea id="c-fabricCareText" rows="2" style="width:100%;margin-bottom:10px;"></textarea>
+        <label class="small-caps">Welfare Interest Note</label><textarea id="c-welfareNote" rows="2" style="width:100%;"></textarea>
+      </div>
+
+      <div class="admin-card" style="margin-bottom:18px;">
+        <h4 style="margin-top:0;">Custom Sections</h4>
+        <p class="helper-text">Add extra homepage sections — a seasonal note, a "Chapter Two coming soon" teaser, and so on. They appear after the reviews, in the order added.</p>
+        <div id="customSectionsEditor"></div>
+        <button class="btn btn-solid btn-sm" type="button" id="addCustomSectionBtn" style="margin-top:10px;">+ Add Section</button>
+      </div>
+
+      <button class="btn btn-solid" id="saveContentBtn">Save All Content Changes</button>
+      <span class="alert alert-success" id="contentSaved" style="display:none;margin-left:12px;padding:8px 14px;">Saved!</span>
+    </section>
+
+    <!-- POLICIES -->
+    <section class="panel" id="panel-policies">
+      <div class="admin-card" style="margin-bottom:18px;">
+        <h4 style="margin-top:0;">Return &amp; Exchange Policy</h4>
+        <textarea id="pol-return" rows="10" style="width:100%;font-family:monospace;font-size:.8rem;"></textarea>
+      </div>
+      <div class="admin-card" style="margin-bottom:18px;">
+        <h4 style="margin-top:0;">Privacy Policy</h4>
+        <textarea id="pol-privacy" rows="10" style="width:100%;font-family:monospace;font-size:.8rem;"></textarea>
+      </div>
+      <div class="admin-card" style="margin-bottom:18px;">
+        <h4 style="margin-top:0;">Shipping &amp; Delivery Policy</h4>
+        <textarea id="pol-shipping" rows="10" style="width:100%;font-family:monospace;font-size:.8rem;"></textarea>
+      </div>
+      <p class="helper-text">These fields accept basic HTML (e.g. &lt;h3&gt;, &lt;p&gt;, &lt;ul&gt;&lt;li&gt;) to match the formatting on the live policy pages.</p>
+      <button class="btn btn-solid" id="savePoliciesBtn">Save Policy Changes</button>
+      <span class="alert alert-success" id="policiesSaved" style="display:none;margin-left:12px;padding:8px 14px;">Saved!</span>
+    </section>
+
+    <!-- MENU & SETTINGS -->
+    <section class="panel" id="panel-menu">
+      <div class="admin-card" style="margin-bottom:18px;">
+        <h4 style="margin-top:0;">Top Menu (drawer navigation)</h4>
+        <div id="menuEditor"></div>
+        <div class="inline-form" style="margin-top:10px;">
+          <input id="newMenuLabel" placeholder="Label">
+          <input id="newMenuHref" placeholder="Link (e.g. shop.html)">
+          <button class="btn btn-sm btn-solid" type="button" id="addMenuBtn">Add Menu Item</button>
+        </div>
+      </div>
+      <div class="admin-card" style="margin-bottom:18px;">
+        <h4 style="margin-top:0;">Top Marquee Ticker</h4>
+        <div id="marqueeEditor"></div>
+        <div class="inline-form" style="margin-top:10px;">
+          <input id="newMarqueeText" placeholder="e.g. FESTIVE SALE — 10% OFF">
+          <button class="btn btn-sm btn-solid" type="button" id="addMarqueeBtn">Add Ticker Item</button>
+        </div>
+      </div>
+      <div class="admin-card">
+        <h4 style="margin-top:0;">Site Settings</h4>
+        <label class="small-caps">Instagram URL</label><input id="s-insta" style="width:100%;margin-bottom:10px;">
+        <label class="small-caps">Contact Email</label><input id="s-email" style="width:100%;margin-bottom:10px;">
+        <label class="small-caps">Contact Phone</label><input id="s-phone" style="width:100%;margin-bottom:10px;">
+        <button class="btn btn-solid btn-sm" id="saveSettingsBtn">Save Settings</button>
+        <span class="alert alert-success" id="settingsSaved" style="display:none;margin-left:12px;padding:6px 12px;">Saved!</span>
+        <hr style="margin:22px 0;border:none;border-top:1px solid var(--line);">
+        <h4>Change Admin Password</h4>
+        <div class="inline-form">
+          <input id="newAdminUser" placeholder="New username">
+          <input id="newAdminPass" placeholder="New password" type="password">
+          <button class="btn btn-sm" type="button" id="changeAdminBtn">Update Login</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- THEME -->
+    <section class="panel" id="panel-theme">
+      <div class="admin-card">
+        <h4 style="margin-top:0;">Site Colours</h4>
+        <div class="color-row"><input type="color" id="t-ivory"><label>Background (Ivory)</label></div>
+        <div class="color-row"><input type="color" id="t-ivoryDeep"><label>Alternate Section Background</label></div>
+        <div class="color-row"><input type="color" id="t-indigo"><label>Primary / Headings (Indigo)</label></div>
+        <div class="color-row"><input type="color" id="t-rust"><label>Accent (Rust / Ajrakh Red)</label></div>
+        <div class="color-row"><input type="color" id="t-gold"><label>Divider Accent (Zari Gold)</label></div>
+        <div class="color-row"><input type="color" id="t-ink"><label>Body Text</label></div>
+        <div class="color-row"><input type="color" id="t-inkSoft"><label>Secondary / Muted Text</label></div>
+        <div class="color-row"><input type="color" id="t-success"><label>Success / In-Stock Accent</label></div>
+        <button class="btn btn-solid btn-sm" id="saveThemeBtn">Apply &amp; Save Theme</button>
+        <button class="btn btn-sm" id="resetThemeBtn" type="button">Reset to Default</button>
+      </div>
+    </section>
+
+    <!-- REVIEWS -->
+    <section class="panel" id="panel-reviews">
+      <div class="admin-card">
+        <p class="helper-text">Reviews submitted by customers from their account page appear here first. Remove anything you don't want live.</p>
+        <table class="admin-table" id="reviewsTable"></table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="../js/content-store.js"></script>
+<script>
+/* ===================== AUTH GATE ===================== */
+(function(){
+  const AUTH_KEY = 'tdc_admin_auth_v1';
+  const SESSION_KEY = 'tdc_admin_session';
+
+  function getAuth(){
+    try{ return JSON.parse(localStorage.getItem(AUTH_KEY)) || { user:'admin', pass:'admin123' }; }
+    catch(e){ return { user:'admin', pass:'admin123' }; }
+  }
+  function setAuth(a){ localStorage.setItem(AUTH_KEY, JSON.stringify(a)); }
+
+  document.getElementById('adminLoginForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    const a = getAuth();
+    const u = document.getElementById('adminUser').value.trim();
+    const p = document.getElementById('adminPass').value;
+    if(u === a.user && p === a.pass){
+      sessionStorage.setItem(SESSION_KEY, '1');
+      showAdmin();
+    } else {
+      document.getElementById('adminLoginErr').style.display = 'block';
+    }
+  });
+
+  function showAdmin(){
+    document.getElementById('adminLoginWrap').style.display = 'none';
+    document.getElementById('adminShell').style.display = 'flex';
+    window.initAdminDashboard && window.initAdminDashboard();
+  }
+
+  if(sessionStorage.getItem(SESSION_KEY) === '1') showAdmin();
+
+  document.getElementById('adminLogout').addEventListener('click', function(){
+    sessionStorage.removeItem(SESSION_KEY);
+    location.reload();
+  });
+
+  window.TDC_getAdminAuth = getAuth;
+  window.TDC_setAdminAuth = setAuth;
+})();
+
+/* ===================== DASHBOARD LOGIC ===================== */
+let dashboardInited = false;
+window.initAdminDashboard = function(){
+  if(dashboardInited) return; dashboardInited = true;
+  const C = window.TDC_CONTENT;
+
+  /* ---- nav switching ---- */
+  const titles = {
+    overview:'Sales Analytics', products:'Products', categories:'Categories & Collections',
+    coupons:'Coupons & Discounts', content:'Homepage Content', policies:'Policy Pages',
+    menu:'Menu & Settings', theme:'Colours & Theme', reviews:'Customer Reviews'
+  };
+  document.querySelectorAll('.admin-nav button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.admin-nav button').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('panel-'+btn.dataset.p).classList.add('active');
+      document.getElementById('panelTitle').textContent = titles[btn.dataset.p];
+    });
+  });
+
+  /* ================= ANALYTICS (sample data) ================= */
+  function renderKpis(){
+    const totalRevenue = C.products.reduce((s,p)=>s+p.price, 0) * 14; // sample multiplier
+    document.getElementById('kpiRow').innerHTML = `
+      <div class="kpi"><div class="num">&#8377;${totalRevenue.toLocaleString('en-IN')}</div><div class="lbl">Sample Revenue (30 days)</div></div>
+      <div class="kpi"><div class="num">${C.products.length}</div><div class="lbl">Active Products</div></div>
+      <div class="kpi"><div class="num">312</div><div class="lbl">Sample Orders</div></div>
+      <div class="kpi"><div class="num">4.7&#9733;</div><div class="lbl">Avg. Review Rating</div></div>`;
+  }
+
+  function renderCharts(){
+    const names = C.products.map(p=>p.name);
+    const sold = C.products.map((p,i)=> 40 - i*5 + Math.round(Math.random()*10));
+    new Chart(document.getElementById('chartProducts'), {
+      type:'bar',
+      data:{ labels:names, datasets:[{ label:'Units Sold (sample)', data:sold, backgroundColor:'#96402C' }] },
+      options:{ plugins:{legend:{display:false}}, scales:{x:{ticks:{autoSkip:false,maxRotation:40,minRotation:20}}} }
+    });
+
+    new Chart(document.getElementById('chartRegion'), {
+      type:'bar',
+      data:{ labels:['North (Delhi-NCR, Punjab)','West (Maharashtra, Gujarat)','South (Karnataka, TN)','East (WB, Odisha)'],
+             datasets:[{ label:'Orders (sample)', data:[128,96,74,41], backgroundColor:'#1E3A52' }] },
+      options:{ indexAxis:'y', plugins:{legend:{display:false}} }
+    });
+
+    new Chart(document.getElementById('chartAge'), {
+      type:'bar',
+      data:{ labels:['18–24','25–34','35–44','45–54','55+'], datasets:[{ label:'Customers (sample)', data:[62,148,74,22,6], backgroundColor:'#B98A34' }] },
+      options:{ plugins:{legend:{display:false}} }
+    });
+
+    new Chart(document.getElementById('chartGender'), {
+      type:'doughnut',
+      data:{ labels:['Women','Men','Unspecified'], datasets:[{ data:[68,27,5], backgroundColor:['#96402C','#1E3A52','#B98A34'] }] }
+    });
+
+    new Chart(document.getElementById('chartTrend'), {
+      type:'line',
+      data:{ labels:['Feb','Mar','Apr','May','Jun','Jul'],
+             datasets:[{ label:'Revenue ₹ (sample)', data:[42000,51000,47000,63000,71000,84000], borderColor:'#96402C', backgroundColor:'rgba(150,64,44,.12)', fill:true, tension:.35 }] },
+      options:{ plugins:{legend:{display:false}} }
+    });
+  }
+  renderKpis(); renderCharts();
+
+  /* ================= PRODUCTS ================= */
+  function populateCollectionSelect(){
+    document.getElementById('pf-collection').innerHTML = C.collections.filter(c=>c!=='All').map(c=>`<option>${c}</option>`).join('');
+    document.getElementById('pf-category').innerHTML = '<option value="">— None —</option>' + C.merchCategories.map(c=>`<option>${c.name}</option>`).join('');
+    populateSubcollectionSelect();
+    populateSizeGuideSelect();
+  }
+  function populateSizeGuideSelect(){
+    document.getElementById('pf-sizeguide').innerHTML = '<option value="">— None —</option>' + C.sizeGuides.map(g=>`<option value="${g.id}">${g.name}</option>`).join('');
+  }
+  function populateSubcollectionSelect(){
+    const catName = document.getElementById('pf-category').value;
+    const cat = C.merchCategories.find(c=>c.name===catName);
+    const subs = cat ? cat.subcollections : [];
+    document.getElementById('pf-subcollection').innerHTML = '<option value="">— None —</option>' + subs.map(s=>`<option>${s}</option>`).join('');
+  }
+  document.getElementById('pf-category').addEventListener('change', populateSubcollectionSelect);
+
+  function availabilityTag(p){
+    if(p.availability==='out') return '<span class="tag tag-out">Out of Stock</span>';
+    if(p.availability==='preorder') return '<span class="tag tag-mto">Pre-order</span>';
+    if(p.availability==='made-to-order') return '<span class="tag tag-mto">Made to Order</span>';
+    return '<span class="tag tag-ok">Available</span>';
+  }
+  function renderProductsTable(){
+    const rows = C.products.map(p=>`
+      <tr>
+        <td>${p.image?`<img src="${p.image}" style="width:36px;height:44px;object-fit:cover;border-radius:2px;">`:'—'}</td>
+        <td>${p.name}</td><td>${p.collection}</td><td>&#8377;${p.price}</td>
+        <td>${availabilityTag(p)}</td>
+        <td>${p.featuredHome ? '<span class="tag tag-ok">Yes</span>' : '—'}</td>
+        <td>
+          <button class="btn btn-sm" data-edit="${p.id}">Edit</button>
+          <button class="btn btn-sm btn-rust" data-del="${p.id}">Delete</button>
+        </td>
+      </tr>`).join('');
+    document.getElementById('productsTable').innerHTML = `
+      <tr><th>Image</th><th>Name</th><th>Collection</th><th>Price</th><th>Availability</th><th>On Homepage</th><th>Actions</th></tr>${rows}`;
+    document.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>editProduct(b.dataset.edit)));
+    document.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>deleteProduct(b.dataset.del)));
+  }
+  let editingImage = '';
+  function editProduct(id){
+    const p = C.products.find(x=>x.id===id); if(!p) return;
+    pf_id.value = p.id; pf_name.value = p.name; pf_collection.value = p.collection; pf_gender.value = p.gender;
+    pf_region.value = p.region||''; pf_price.value = p.price; pf_mrp.value = p.mrp; pf_availability.value = p.availability||'available';
+    pf_sizes.value = (p.sizes||[]).join(','); pf_desc.value = p.description||'';
+    pf_category.value = p.category||''; populateSubcollectionSelect(); pf_subcollection.value = p.subCollection||'';
+    pf_featured.checked = !!p.featuredHome;
+    document.getElementById('pf-sizeguide').value = p.sizeGuideId || '';
+    editingImage = p.image || '';
+    const preview = document.getElementById('pf-image-preview'), clearBtn = document.getElementById('pf-image-clear');
+    if(editingImage){ preview.src = editingImage; preview.style.display='block'; clearBtn.style.display='inline-block'; }
+    else { preview.style.display='none'; clearBtn.style.display='none'; }
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  function deleteProduct(id){
+    if(!confirm('Delete this product?')) return;
+    C.products = C.products.filter(x=>x.id!==id);
+    window.TDC_saveContent(C); renderProductsTable();
+  }
+  const pf_id=document.getElementById('pf-id'), pf_name=document.getElementById('pf-name'), pf_collection=document.getElementById('pf-collection'),
+        pf_gender=document.getElementById('pf-gender'), pf_region=document.getElementById('pf-region'), pf_price=document.getElementById('pf-price'),
+        pf_mrp=document.getElementById('pf-mrp'), pf_availability=document.getElementById('pf-availability'),
+        pf_sizes=document.getElementById('pf-sizes'), pf_desc=document.getElementById('pf-desc'),
+        pf_category=document.getElementById('pf-category'), pf_subcollection=document.getElementById('pf-subcollection'),
+        pf_featured=document.getElementById('pf-featured');
+
+  document.getElementById('pf-image').addEventListener('change', function(e){
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev){
+      editingImage = ev.target.result;
+      const preview = document.getElementById('pf-image-preview');
+      preview.src = editingImage; preview.style.display='block';
+      document.getElementById('pf-image-clear').style.display='inline-block';
+    };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById('pf-image-clear').addEventListener('click', function(){
+    editingImage = '';
+    document.getElementById('pf-image').value = '';
+    document.getElementById('pf-image-preview').style.display='none';
+    this.style.display='none';
+  });
+
+  document.getElementById('productForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    const palettes = ['bagru','dabu','ajrakh','kantha'];
+    const id = pf_id.value || 'p'+Date.now();
+    const data = {
+      id, name:pf_name.value.trim(), collection:pf_collection.value, gender:pf_gender.value,
+      category: pf_category.value, subCollection: pf_subcollection.value,
+      region:pf_region.value.trim(), price:Number(pf_price.value), mrp:Number(pf_mrp.value)||Number(pf_price.value),
+      availability:pf_availability.value, description:pf_desc.value.trim(),
+      sizes: pf_sizes.value.split(',').map(s=>s.trim()).filter(Boolean),
+      image: editingImage,
+      featuredHome: pf_featured.checked,
+      sizeGuideId: document.getElementById('pf-sizeguide').value,
+      palette: palettes[C.products.length % palettes.length]
+    };
+    const idx = C.products.findIndex(p=>p.id===id);
+    if(idx>-1){ data.palette = C.products[idx].palette; C.products[idx] = data; } else { C.products.push(data); }
+    window.TDC_saveContent(C);
+    renderProductsTable(); this.reset(); pf_id.value=''; editingImage='';
+    document.getElementById('pf-image-preview').style.display='none';
+    document.getElementById('pf-image-clear').style.display='none';
+  });
+  document.getElementById('pf-clear').addEventListener('click', ()=>{
+    document.getElementById('productForm').reset(); pf_id.value=''; editingImage='';
+    document.getElementById('pf-image-preview').style.display='none';
+    document.getElementById('pf-image-clear').style.display='none';
+  });
+
+  /* ================= CRAFT CHAPTERS ================= */
+  function renderCraftsEditor(){
+    document.getElementById('craftsEditor').innerHTML = C.crafts.map((c,i)=>`
+      <div class="admin-card" style="margin-bottom:14px;">
+        <div class="inline-form" style="margin-bottom:8px;">
+          <div><label class="small-caps">Chapter Name</label><input data-ci="${i}" data-cf="name" value="${c.name}"></div>
+          <div><label class="small-caps">Origin</label><input data-ci="${i}" data-cf="origin" value="${c.origin}"></div>
+          <div><label class="small-caps">Key (for pattern swatch, lowercase, no spaces)</label><input data-ci="${i}" data-cf="key" value="${c.key}"></div>
+        </div>
+        <label class="small-caps">Short Card Text</label>
+        <textarea data-ci="${i}" data-cf="fact" rows="2" style="width:100%;margin-bottom:8px;">${c.fact}</textarea>
+        <label class="small-caps">Optional Longer Story (shown as "Read the full story")</label>
+        <textarea data-ci="${i}" data-cf="story" rows="3" style="width:100%;margin-bottom:8px;" placeholder="Leave blank if this chapter doesn't need a longer story yet.">${c.story||''}</textarea>
+        <button class="btn btn-sm btn-rust" type="button" data-craftdel="${i}">Remove This Chapter</button>
+      </div>`).join('');
+    document.querySelectorAll('#craftsEditor [data-ci]').forEach(inp=>{
+      inp.addEventListener('change', ()=>{ C.crafts[inp.dataset.ci][inp.dataset.cf] = inp.value; window.TDC_saveContent(C); });
+    });
+    document.querySelectorAll('[data-craftdel]').forEach(b=>b.addEventListener('click',()=>{
+      if(!confirm('Remove this entire chapter theme?')) return;
+      C.crafts.splice(Number(b.dataset.craftdel),1); window.TDC_saveContent(C); renderCraftsEditor();
+    }));
+  }
+  document.getElementById('addCraftBtn').addEventListener('click', ()=>{
+    C.crafts.push({ key:'newchapter'+Date.now(), name:'New Chapter', origin:'', fact:'', story:'' });
+    window.TDC_saveContent(C); renderCraftsEditor();
+  });
+
+  /* ================= CATEGORIES / COLLECTIONS ================= */
+  function renderCollectionList(){
+    document.getElementById('collectionList').innerHTML = C.collections.map((c,i)=>`
+      <li style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);">${c}
+        ${c!=='All'?`<button class="btn btn-sm btn-rust" data-coldel="${i}">Remove</button>`:''}
+      </li>`).join('');
+    document.querySelectorAll('[data-coldel]').forEach(b=>b.addEventListener('click',()=>{
+      C.collections.splice(Number(b.dataset.coldel),1); window.TDC_saveContent(C); renderCollectionList(); populateCollectionSelect();
+    }));
+  }
+  document.getElementById('addCollectionBtn').addEventListener('click', ()=>{
+    const v = document.getElementById('newCollection').value.trim(); if(!v) return;
+    C.collections.push(v); window.TDC_saveContent(C); renderCollectionList(); populateCollectionSelect(); document.getElementById('newCollection').value='';
+  });
+
+  /* ================= MERCHANDISING CATEGORIES (nested) ================= */
+  function renderMerchCategoriesEditor(){
+    document.getElementById('merchCategoriesEditor').innerHTML = C.merchCategories.map((cat,ci)=>`
+      <div class="admin-card" style="margin-bottom:14px;">
+        <div class="inline-form" style="margin-bottom:8px;align-items:center;">
+          <input data-mci="${ci}" style="font-weight:600;" value="${cat.name}">
+          <button class="btn btn-sm btn-rust" type="button" data-mcdel="${ci}">Remove Category</button>
+        </div>
+        <div class="small-caps" style="color:var(--ink-soft);margin-bottom:6px;">Sub-Collections</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+          ${cat.subcollections.map((s,si)=>`<span class="chip" style="display:flex;align-items:center;gap:6px;">${s} <button type="button" data-mcsub-del="${ci}:${si}" style="background:none;border:none;color:var(--rust);cursor:pointer;">&times;</button></span>`).join('') || '<span class="helper-text">No sub-collections yet.</span>'}
+        </div>
+        <div class="inline-form">
+          <input placeholder="New sub-collection, e.g. Party Wear" data-mcsub-new="${ci}">
+          <button class="btn btn-sm btn-solid" type="button" data-mcsub-add="${ci}">+ Add Sub-Collection</button>
+        </div>
+      </div>`).join('');
+
+    document.querySelectorAll('[data-mci]').forEach(inp=>{
+      inp.addEventListener('change', ()=>{ C.merchCategories[inp.dataset.mci].name = inp.value; window.TDC_saveContent(C); populateCollectionSelect(); });
+    });
+    document.querySelectorAll('[data-mcdel]').forEach(b=>b.addEventListener('click',()=>{
+      if(!confirm('Remove this category and all its sub-collections?')) return;
+      C.merchCategories.splice(Number(b.dataset.mcdel),1); window.TDC_saveContent(C); renderMerchCategoriesEditor(); populateCollectionSelect();
+    }));
+    document.querySelectorAll('[data-mcsub-del]').forEach(b=>b.addEventListener('click',()=>{
+      const [ci,si] = b.dataset.mcsubDel.split(':').map(Number);
+      C.merchCategories[ci].subcollections.splice(si,1);
+      window.TDC_saveContent(C); renderMerchCategoriesEditor(); populateCollectionSelect();
+    }));
+    document.querySelectorAll('[data-mcsub-add]').forEach(b=>b.addEventListener('click',()=>{
+      const ci = Number(b.dataset.mcsubAdd);
+      const input = document.querySelector(`[data-mcsub-new="${ci}"]`);
+      const v = input.value.trim(); if(!v) return;
+      C.merchCategories[ci].subcollections.push(v);
+      window.TDC_saveContent(C); renderMerchCategoriesEditor(); populateCollectionSelect();
+    }));
+  }
+  document.getElementById('addMerchCategoryBtn').addEventListener('click', ()=>{
+    const v = document.getElementById('newMerchCategory').value.trim(); if(!v) return;
+    C.merchCategories.push({ name:v, subcollections:[] });
+    window.TDC_saveContent(C); renderMerchCategoriesEditor(); populateCollectionSelect();
+    document.getElementById('newMerchCategory').value='';
+  });
+
+  /* ================= SIZE GUIDES ================= */
+  let pendingSizeGuideImage = '';
+  document.getElementById('newSizeGuideImage').addEventListener('change', function(e){
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev){ pendingSizeGuideImage = ev.target.result; };
+    reader.readAsDataURL(file);
+  });
+  function renderSizeGuidesEditor(){
+    document.getElementById('sizeGuidesEditor').innerHTML = C.sizeGuides.map((g,i)=>`
+      <div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--line);">
+        ${g.image ? `<img src="${g.image}" style="width:44px;height:44px;object-fit:cover;border-radius:3px;">` : `<div style="width:44px;height:44px;background:var(--ivory-deep);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:.6rem;color:var(--ink-soft);text-align:center;">No image</div>`}
+        <input data-sgi="${i}" value="${g.name}" style="flex:1;">
+        <label class="btn btn-sm" style="margin:0;">Replace Image<input type="file" accept="image/*" data-sgimg="${i}" style="display:none;"></label>
+        <button class="btn btn-sm btn-rust" type="button" data-sgdel="${i}">Remove</button>
+      </div>`).join('');
+    document.querySelectorAll('#sizeGuidesEditor [data-sgi]').forEach(inp=>{
+      inp.addEventListener('change', ()=>{ C.sizeGuides[inp.dataset.sgi].name = inp.value; window.TDC_saveContent(C); populateSizeGuideSelect(); });
+    });
+    document.querySelectorAll('[data-sgimg]').forEach(inp=>{
+      inp.addEventListener('change', (e)=>{
+        const file = e.target.files[0]; if(!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev)=>{
+          C.sizeGuides[Number(inp.dataset.sgimg)].image = ev.target.result;
+          window.TDC_saveContent(C); renderSizeGuidesEditor();
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+    document.querySelectorAll('[data-sgdel]').forEach(b=>b.addEventListener('click',()=>{
+      if(!confirm('Remove this size guide chart?')) return;
+      C.sizeGuides.splice(Number(b.dataset.sgdel),1); window.TDC_saveContent(C); renderSizeGuidesEditor(); populateSizeGuideSelect();
+    }));
+  }
+  document.getElementById('addSizeGuideBtn').addEventListener('click', ()=>{
+    const name = document.getElementById('newSizeGuideName').value.trim();
+    if(!name){ alert('Give the size guide a name first.'); return; }
+    C.sizeGuides.push({ id:'sg'+Date.now(), name, image: pendingSizeGuideImage });
+    window.TDC_saveContent(C); renderSizeGuidesEditor(); populateSizeGuideSelect();
+    document.getElementById('newSizeGuideName').value='';
+    document.getElementById('newSizeGuideImage').value='';
+    pendingSizeGuideImage = '';
+  });
+
+  /* ================= COUPONS ================= */
+  function renderCoupons(){
+    const rows = C.coupons.map((c,i)=>`
+      <tr><td>${c.code}</td><td>${c.type==='percent'?c.value+'%':'₹'+c.value}</td><td>${c.note||''}</td>
+      <td>${c.active?'<span class="tag tag-ok">Active</span>':'<span class="tag tag-out">Off</span>'}</td>
+      <td><button class="btn btn-sm" data-tog="${i}">${c.active?'Disable':'Enable'}</button> <button class="btn btn-sm btn-rust" data-coupdel="${i}">Delete</button></td></tr>`).join('');
+    document.getElementById('couponsTable').innerHTML = `<tr><th>Code</th><th>Value</th><th>Note</th><th>Status</th><th>Actions</th></tr>${rows}`;
+    document.querySelectorAll('[data-tog]').forEach(b=>b.addEventListener('click',()=>{
+      C.coupons[Number(b.dataset.tog)].active = !C.coupons[Number(b.dataset.tog)].active; window.TDC_saveContent(C); renderCoupons();
+    }));
+    document.querySelectorAll('[data-coupdel]').forEach(b=>b.addEventListener('click',()=>{
+      C.coupons.splice(Number(b.dataset.coupdel),1); window.TDC_saveContent(C); renderCoupons();
+    }));
+  }
+  document.getElementById('couponForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    C.coupons.push({ code:document.getElementById('cf-code').value.trim().toUpperCase(), type:document.getElementById('cf-type').value,
+      value:Number(document.getElementById('cf-value').value), note:document.getElementById('cf-note').value.trim(), active:true });
+    window.TDC_saveContent(C); renderCoupons(); this.reset();
+  });
+
+  /* ================= CONTENT EDITOR ================= */
+  function renderTrustEditor(){
+    document.getElementById('trustEditor').innerHTML = C.trustBadges.items.map((it,i)=>`
+      <div class="inline-form" style="margin-bottom:8px;align-items:center;">
+        <input data-ti="${i}" data-f="label" value="${it.label}">
+        <select data-ti="${i}" data-f="icon">
+          ${['hand','house','globe','indiamap','needle','heart','leaf','thread'].map(k=>`<option value="${k}" ${it.icon===k?'selected':''}>${k}</option>`).join('')}
+        </select>
+        <button class="btn btn-sm btn-rust" type="button" data-trustdel="${i}">Remove</button>
+      </div>`).join('');
+    document.querySelectorAll('#trustEditor [data-ti]').forEach(inp=>{
+      inp.addEventListener('change', ()=>{ C.trustBadges.items[inp.dataset.ti][inp.dataset.f] = inp.value; window.TDC_saveContent(C); });
+    });
+    document.querySelectorAll('[data-trustdel]').forEach(b=>b.addEventListener('click',()=>{
+      C.trustBadges.items.splice(Number(b.dataset.trustdel),1); window.TDC_saveContent(C); renderTrustEditor();
+    }));
+  }
+  document.getElementById('addTrustBtn').addEventListener('click', ()=>{
+    const label = document.getElementById('newTrustLabel').value.trim(); if(!label) return;
+    const icon = document.getElementById('newTrustIcon').value;
+    C.trustBadges.items.push({ label, icon });
+    window.TDC_saveContent(C); renderTrustEditor();
+    document.getElementById('newTrustLabel').value = '';
+  });
+
+  function renderCustomSectionsEditor(){
+    document.getElementById('customSectionsEditor').innerHTML = (C.customSections||[]).map((s,i)=>`
+      <div class="admin-card" style="margin-bottom:12px;">
+        <div class="inline-form" style="margin-bottom:8px;">
+          <div><label class="small-caps">Eyebrow</label><input data-si="${i}" data-sf="eyebrow" value="${s.eyebrow||''}"></div>
+          <div><label class="small-caps">Heading</label><input data-si="${i}" data-sf="heading" value="${s.heading||''}"></div>
+          <div><label class="small-caps">Background</label><input type="color" data-si="${i}" data-sf="bg" value="${s.bg||'#EADFC3'}"></div>
+        </div>
+        <label class="small-caps">Body Text</label>
+        <textarea data-si="${i}" data-sf="body" rows="2" style="width:100%;margin-bottom:8px;">${s.body||''}</textarea>
+        <button class="btn btn-sm btn-rust" type="button" data-sectiondel="${i}">Remove Section</button>
+        ${i>0?`<button class="btn btn-sm" type="button" data-sectionup="${i}">&uarr; Move Up</button>`:''}
+        ${i<(C.customSections.length-1)?`<button class="btn btn-sm" type="button" data-sectiondown="${i}">&darr; Move Down</button>`:''}
+      </div>`).join('') || '<p class="helper-text">No custom sections yet — add one below.</p>';
+    document.querySelectorAll('#customSectionsEditor [data-si]').forEach(inp=>{
+      inp.addEventListener('change', ()=>{ C.customSections[inp.dataset.si][inp.dataset.sf] = inp.value; window.TDC_saveContent(C); });
+    });
+    document.querySelectorAll('[data-sectiondel]').forEach(b=>b.addEventListener('click',()=>{
+      C.customSections.splice(Number(b.dataset.sectiondel),1); window.TDC_saveContent(C); renderCustomSectionsEditor();
+    }));
+    document.querySelectorAll('[data-sectionup]').forEach(b=>b.addEventListener('click',()=>{
+      const i = Number(b.dataset.sectionup);
+      [C.customSections[i-1], C.customSections[i]] = [C.customSections[i], C.customSections[i-1]];
+      window.TDC_saveContent(C); renderCustomSectionsEditor();
+    }));
+    document.querySelectorAll('[data-sectiondown]').forEach(b=>b.addEventListener('click',()=>{
+      const i = Number(b.dataset.sectiondown);
+      [C.customSections[i+1], C.customSections[i]] = [C.customSections[i], C.customSections[i+1]];
+      window.TDC_saveContent(C); renderCustomSectionsEditor();
+    }));
+  }
+  document.getElementById('addCustomSectionBtn').addEventListener('click', ()=>{
+    C.customSections = C.customSections || [];
+    C.customSections.push({ eyebrow:'New Section', heading:'Untitled Section', body:'', bg:'#EADFC3' });
+    window.TDC_saveContent(C); renderCustomSectionsEditor();
+  });
+
+  function loadContentEditor(){
+    document.getElementById('c-heroTagline').value = C.hero.tagline;
+    document.getElementById('c-storyHeading').value = C.ourStory.heading;
+    document.getElementById('c-storyPullQuote').value = C.ourStory.pullQuote;
+    document.getElementById('c-storyBody').value = C.ourStory.body;
+    document.getElementById('c-nazarBody').value = C.nazar.body;
+    document.getElementById('c-welfareHeading').value = C.welfare.heading;
+    document.getElementById('c-welfareBody').value = C.welfare.body;
+    document.getElementById('c-promoHeading').value = C.promoBanner.heading;
+    document.getElementById('c-promoSubtext').value = C.promoBanner.subtext;
+    document.getElementById('c-promoCta').value = C.promoBanner.ctaLabel;
+    document.getElementById('c-shippingReturnsText').value = C.productPageInfo.shippingReturnsText;
+    document.getElementById('c-fabricCareText').value = C.productPageInfo.fabricCareText;
+    document.getElementById('c-welfareNote').value = C.productPageInfo.welfareNote;
+    renderTrustEditor();
+    renderCustomSectionsEditor();
+  }
+  document.getElementById('saveContentBtn').addEventListener('click', ()=>{
+    C.hero.tagline = document.getElementById('c-heroTagline').value;
+    C.ourStory.heading = document.getElementById('c-storyHeading').value;
+    C.ourStory.pullQuote = document.getElementById('c-storyPullQuote').value;
+    C.ourStory.body = document.getElementById('c-storyBody').value;
+    C.nazar.body = document.getElementById('c-nazarBody').value;
+    C.welfare.heading = document.getElementById('c-welfareHeading').value;
+    C.welfare.body = document.getElementById('c-welfareBody').value;
+    C.promoBanner.heading = document.getElementById('c-promoHeading').value;
+    C.promoBanner.subtext = document.getElementById('c-promoSubtext').value;
+    C.promoBanner.ctaLabel = document.getElementById('c-promoCta').value;
+    C.productPageInfo.shippingReturnsText = document.getElementById('c-shippingReturnsText').value;
+    C.productPageInfo.fabricCareText = document.getElementById('c-fabricCareText').value;
+    C.productPageInfo.welfareNote = document.getElementById('c-welfareNote').value;
+    window.TDC_saveContent(C);
+    document.getElementById('contentSaved').style.display='inline-block';
+    setTimeout(()=>{ const el=document.getElementById('contentSaved'); if(el) el.style.display='none'; }, 2000);
+  });
+
+  /* ================= POLICIES ================= */
+  function loadPolicies(){
+    document.getElementById('pol-return').value = C.policies.returnExchange.body;
+    document.getElementById('pol-privacy').value = C.policies.privacy.body;
+    document.getElementById('pol-shipping').value = C.policies.shipping.body;
+  }
+  document.getElementById('savePoliciesBtn').addEventListener('click', ()=>{
+    C.policies.returnExchange.body = document.getElementById('pol-return').value;
+    C.policies.privacy.body = document.getElementById('pol-privacy').value;
+    C.policies.shipping.body = document.getElementById('pol-shipping').value;
+    window.TDC_saveContent(C);
+    document.getElementById('policiesSaved').style.display='inline-block';
+    setTimeout(()=>{ const el=document.getElementById('policiesSaved'); if(el) el.style.display='none'; }, 2000);
+  });
+
+  /* ================= MENU + SETTINGS ================= */
+  function renderMenuEditor(){
+    document.getElementById('menuEditor').innerHTML = C.menu.map((m,i)=>`
+      <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center;">
+        <input data-mi="${i}" data-f="label" value="${m.label}" style="flex:1;">
+        <input data-mi="${i}" data-f="href" value="${m.href}" style="flex:1;">
+        <button class="btn btn-sm btn-rust" data-mdel="${i}" type="button">Remove</button>
+      </div>`).join('');
+    document.querySelectorAll('#menuEditor input').forEach(inp=>{
+      inp.addEventListener('change', ()=>{ C.menu[inp.dataset.mi][inp.dataset.f]=inp.value; window.TDC_saveContent(C); });
+    });
+    document.querySelectorAll('[data-mdel]').forEach(b=>b.addEventListener('click',()=>{
+      C.menu.splice(Number(b.dataset.mdel),1); window.TDC_saveContent(C); renderMenuEditor();
+    }));
+  }
+  document.getElementById('addMenuBtn').addEventListener('click', ()=>{
+    const l = document.getElementById('newMenuLabel').value.trim(), h = document.getElementById('newMenuHref').value.trim();
+    if(!l||!h) return;
+    C.menu.push({label:l, href:h}); window.TDC_saveContent(C); renderMenuEditor();
+    document.getElementById('newMenuLabel').value=''; document.getElementById('newMenuHref').value='';
+  });
+
+  function renderMarqueeEditor(){
+    document.getElementById('marqueeEditor').innerHTML = C.marquee.map((t,i)=>`
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <input data-mqi="${i}" value="${t}" style="flex:1;">
+        <button class="btn btn-sm btn-rust" data-mqdel="${i}" type="button">Remove</button>
+      </div>`).join('');
+    document.querySelectorAll('#marqueeEditor input').forEach(inp=>{
+      inp.addEventListener('change', ()=>{ C.marquee[inp.dataset.mqi]=inp.value; window.TDC_saveContent(C); });
+    });
+    document.querySelectorAll('[data-mqdel]').forEach(b=>b.addEventListener('click',()=>{
+      C.marquee.splice(Number(b.dataset.mqdel),1); window.TDC_saveContent(C); renderMarqueeEditor();
+    }));
+  }
+  document.getElementById('addMarqueeBtn').addEventListener('click', ()=>{
+    const v = document.getElementById('newMarqueeText').value.trim(); if(!v) return;
+    C.marquee.push(v); window.TDC_saveContent(C); renderMarqueeEditor(); document.getElementById('newMarqueeText').value='';
+  });
+
+  function loadSettings(){
+    document.getElementById('s-insta').value = C.settings.instagramUrl;
+    document.getElementById('s-email').value = C.settings.contactEmail;
+    document.getElementById('s-phone').value = C.settings.contactPhone;
+  }
+  document.getElementById('saveSettingsBtn').addEventListener('click', ()=>{
+    C.settings.instagramUrl = document.getElementById('s-insta').value.trim();
+    C.settings.contactEmail = document.getElementById('s-email').value.trim();
+    C.settings.contactPhone = document.getElementById('s-phone').value.trim();
+    window.TDC_saveContent(C);
+    document.getElementById('settingsSaved').style.display='inline-block';
+    setTimeout(()=>{ const el=document.getElementById('settingsSaved'); if(el) el.style.display='none'; }, 2000);
+  });
+  document.getElementById('changeAdminBtn').addEventListener('click', ()=>{
+    const u = document.getElementById('newAdminUser').value.trim(), p = document.getElementById('newAdminPass').value;
+    if(!u||!p){ alert('Enter both a username and password.'); return; }
+    window.TDC_setAdminAuth({ user:u, pass:p });
+    alert('Admin login updated. Use the new credentials next time you log in.');
+  });
+
+  /* ================= THEME ================= */
+  function loadTheme(){
+    t_ivory.value=C.theme.ivory; t_ivoryDeep.value=C.theme.ivoryDeep; t_indigo.value=C.theme.indigo;
+    t_rust.value=C.theme.rust; t_gold.value=C.theme.gold; t_ink.value=C.theme.ink;
+    t_inkSoft.value=C.theme.inkSoft||'#5b5346'; t_success.value=C.theme.success||'#4b7b52';
+  }
+  const t_ivory=document.getElementById('t-ivory'), t_ivoryDeep=document.getElementById('t-ivoryDeep'), t_indigo=document.getElementById('t-indigo'),
+        t_rust=document.getElementById('t-rust'), t_gold=document.getElementById('t-gold'), t_ink=document.getElementById('t-ink'),
+        t_inkSoft=document.getElementById('t-inkSoft'), t_success=document.getElementById('t-success');
+  document.getElementById('saveThemeBtn').addEventListener('click', ()=>{
+    C.theme = { ivory:t_ivory.value, ivoryDeep:t_ivoryDeep.value, indigo:t_indigo.value, rust:t_rust.value, gold:t_gold.value, ink:t_ink.value, inkSoft:t_inkSoft.value, success:t_success.value };
+    window.TDC_saveContent(C);
+    alert('Theme saved. Refresh any open storefront tab to see the new colours.');
+  });
+  document.getElementById('resetThemeBtn').addEventListener('click', ()=>{
+    C.theme = Object.assign({}, window.TDC_DEFAULTS.theme);
+    window.TDC_saveContent(C); loadTheme();
+  });
+
+  /* ================= REVIEWS ================= */
+  function renderReviewsTable(){
+    const rows = C.reviews.map((r,i)=>`
+      <tr><td>${r.name}</td><td>${'★'.repeat(r.rating)}</td><td style="max-width:340px;">${r.text}</td>
+      <td>${r.image?'<span class="tag tag-ok">Has photo</span>':'—'}</td>
+      <td>${r.visible!==false?'<span class="tag tag-ok">On homepage</span>':'<span class="tag tag-out">Hidden</span>'}</td>
+      <td><button class="btn btn-sm" data-revtog="${i}">${r.visible!==false?'Hide':'Show'}</button> <button class="btn btn-sm btn-rust" data-revdel="${i}">Remove</button></td></tr>`).join('');
+    document.getElementById('reviewsTable').innerHTML = `<tr><th>Customer</th><th>Rating</th><th>Review</th><th>Photo</th><th>Homepage</th><th>Actions</th></tr>${rows}`;
+    document.querySelectorAll('[data-revdel]').forEach(b=>b.addEventListener('click',()=>{
+      C.reviews.splice(Number(b.dataset.revdel),1); window.TDC_saveContent(C); renderReviewsTable();
+    }));
+    document.querySelectorAll('[data-revtog]').forEach(b=>b.addEventListener('click',()=>{
+      const idx = Number(b.dataset.revtog);
+      C.reviews[idx].visible = !(C.reviews[idx].visible !== false);
+      window.TDC_saveContent(C); renderReviewsTable();
+    }));
+  }
+
+  /* ---- initial loads ---- */
+  populateCollectionSelect(); renderProductsTable(); renderCraftsEditor(); renderCollectionList(); renderMerchCategoriesEditor();
+  renderSizeGuidesEditor();
+  renderCoupons(); loadContentEditor(); loadPolicies(); renderMenuEditor(); renderMarqueeEditor();
+  loadSettings(); loadTheme(); renderReviewsTable();
+};
+</script>
+</body>
+</html>
